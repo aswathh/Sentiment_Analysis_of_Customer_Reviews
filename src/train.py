@@ -17,29 +17,29 @@ from src.feature import review_vector
 df = load_data()
 df[["clean_review", "label"]].to_csv("data/cleaned.csv", index=False)
 
-X_train, X_test, y_train, y_test = train_test_split(
+x_train, x_test, y_train, y_test = train_test_split(
     df["clean_review"], df["label"],
     test_size=0.2, stratify=df["label"], random_state=42,
 )
 
 # Feature engineering
 bow = CountVectorizer(max_features=20000, ngram_range=(1, 2))
-X_train_bow = bow.fit_transform(X_train)
-X_test_bow = bow.transform(X_test)
+x_train_bow = bow.fit_transform(x_train)
+x_test_bow = bow.transform(x_test)
 
-train_tokens = [t.split() for t in X_train]
-test_tokens = [t.split() for t in X_test]
+train_tokens = [t.split() for t in x_train]
+test_tokens = [t.split() for t in x_test]
 w2v = Word2Vec(sentences=train_tokens, vector_size=100, window=5,
                min_count=2, workers=4, epochs=10, seed=42)
-X_train_w2v = np.array([review_vector(t, w2v) for t in train_tokens])
-X_test_w2v = np.array([review_vector(t, w2v) for t in test_tokens])
+x_train_w2v = np.array([review_vector(t, w2v) for t in train_tokens])
+x_test_w2v = np.array([review_vector(t, w2v) for t in test_tokens])
 
 fitted = {}
 
 #Naive Bayes
 nb = MultinomialNB()
-nb.fit(X_train_bow, y_train)
-pred = nb.predict(X_test_bow)
+nb.fit(x_train_bow, y_train)
+pred = nb.predict(x_test_bow)
 nb_bow = [accuracy_score(y_test, pred), precision_score(y_test, pred),
           recall_score(y_test, pred), f1_score(y_test, pred)]
 fitted[("Naive Bayes", "BoW")] = nb
@@ -47,15 +47,15 @@ fitted[("Naive Bayes", "BoW")] = nb
 
 #Logistic Regression
 lr_b = LogisticRegression(max_iter=1000)
-lr_b.fit(X_train_bow, y_train)
-pred = lr_b.predict(X_test_bow)
+lr_b.fit(x_train_bow, y_train)
+pred = lr_b.predict(x_test_bow)
 lr_bow = [accuracy_score(y_test, pred), precision_score(y_test, pred),
           recall_score(y_test, pred), f1_score(y_test, pred)]
 fitted[("Logistic Regression", "BoW")] = lr_b
 
 lr_w = LogisticRegression(max_iter=1000)
-lr_w.fit(X_train_w2v, y_train)
-pred = lr_w.predict(X_test_w2v)
+lr_w.fit(x_train_w2v, y_train)
+pred = lr_w.predict(x_test_w2v)
 lr_w2v = [accuracy_score(y_test, pred), precision_score(y_test, pred),
           recall_score(y_test, pred), f1_score(y_test, pred)]
 fitted[("Logistic Regression", "Word2Vec")] = lr_w
@@ -63,15 +63,15 @@ fitted[("Logistic Regression", "Word2Vec")] = lr_w
 
 #SVM 
 svm_b = LinearSVC()
-svm_b.fit(X_train_bow, y_train)
-pred = svm_b.predict(X_test_bow)
+svm_b.fit(x_train_bow, y_train)
+pred = svm_b.predict(x_test_bow)
 svm_bow = [accuracy_score(y_test, pred), precision_score(y_test, pred),
            recall_score(y_test, pred), f1_score(y_test, pred)]
 fitted[("SVM", "BoW")] = svm_b
 
 svm_w = LinearSVC()
-svm_w.fit(X_train_w2v, y_train)
-pred = svm_w.predict(X_test_w2v)
+svm_w.fit(x_train_w2v, y_train)
+pred = svm_w.predict(x_test_w2v)
 svm_w2v = [accuracy_score(y_test, pred), precision_score(y_test, pred),
            recall_score(y_test, pred), f1_score(y_test, pred)]
 fitted[("SVM", "Word2Vec")] = svm_w
@@ -79,15 +79,15 @@ fitted[("SVM", "Word2Vec")] = svm_w
 
 #Random Forest
 rf_b = RandomForestClassifier(n_estimators=100, n_jobs=-1, random_state=42)
-rf_b.fit(X_train_bow, y_train)
-pred = rf_b.predict(X_test_bow)
+rf_b.fit(x_train_bow, y_train)
+pred = rf_b.predict(x_test_bow)
 rf_bow = [accuracy_score(y_test, pred), precision_score(y_test, pred),
           recall_score(y_test, pred), f1_score(y_test, pred)]
 fitted[("Random Forest", "BoW")] = rf_b
 
 rf_w = RandomForestClassifier(n_estimators=100, n_jobs=-1, random_state=42)
-rf_w.fit(X_train_w2v, y_train)
-pred = rf_w.predict(X_test_w2v)
+rf_w.fit(x_train_w2v, y_train)
+pred = rf_w.predict(x_test_w2v)
 rf_w2v = [accuracy_score(y_test, pred), precision_score(y_test, pred),
           recall_score(y_test, pred), f1_score(y_test, pred)]
 fitted[("Random Forest", "Word2Vec")] = rf_w
