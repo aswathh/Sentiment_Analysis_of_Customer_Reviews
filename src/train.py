@@ -111,13 +111,6 @@ print("\n", comparison.round(4))
 comparison.to_csv("models/results.csv", index=False)
 
 # Save 
-best = comparison.iloc[0]
-artifact = {
-    "model_name": best["Model"],
-    "features": best["Features"],
-    "clf": fitted[(best["Model"], best["Features"])],
-    "bow": bow if best["Features"] == "BoW" else None,
-    "w2v": w2v if best["Features"] == "Word2Vec" else None,
-}
-joblib.dump(artifact, "models/best_model.joblib")
-print(f"\nBest: {best['Model']} + {best['Features']} (F1={best['F1']:.4f}) saved")
+joblib.dump(lr_b, "models/best_model.joblib")
+joblib.dump(bow, "models/bow_vectorizer.joblib")
+print("Saved: Logistic Regression + BoW")
