@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from src.preprocess import load_data
-from src.features import review_vector
+from src.feature import review_vector
 
 # ---------- Data ----------
 df = load_data()
